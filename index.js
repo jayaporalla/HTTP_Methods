@@ -1,4 +1,5 @@
 const http = require("http");
+const qs = require("querystring");
 let users = [
   {
     id: 1,
@@ -6,7 +7,7 @@ let users = [
   },
   {
     id: 2,
-    name: "Saiteja",
+    name: "Sassy_tej",
   },
   {
     id: 3,
@@ -16,10 +17,26 @@ let users = [
 
 const server = http.createServer((req, res) => {
   if (req.method === "GET") {
+    console.log(req.url);
+    if (req.url.includes("?")) {
+      // const searchParams = new URLSearchParams(req.url);
+      // const id = searchParams.get("id");
+      const data = qs.decode(req.url);
+      console.log(data);
+      const id = data.id;
+      const user = users.find((u) => u.id === +id);
+      res.setHeader("Content-Type", "application/json");
+      res.write(
+        JSON.stringify({
+          user
+        })
+      );
+      res.end();
+    }
     res.setHeader("Content-Type", "application/json");
     res.write(
       JSON.stringify({
-        users,
+        users
       })
     );
     res.end();
@@ -80,7 +97,7 @@ const server = http.createServer((req, res) => {
           res.setHeader("Content-Type", "application/json");
           res.write(
             JSON.stringify({
-              message: "Invalid Data"
+              message: "Invalid Data",
             })
           );
           res.end();
@@ -119,10 +136,10 @@ const server = http.createServer((req, res) => {
           res.setHeader("Content-Type", "application/json");
           res.write(
             JSON.stringify({
-              message: "Invalid Data"
+              message: "Invalid Data",
             })
           );
-          res.end();
+          return res.end();
         }
         const userExists = users.some((u) => u.id === data.id);
         users = users.filter((u) => u.id !== data.id);
@@ -130,19 +147,19 @@ const server = http.createServer((req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.write(
           JSON.stringify({
-            message: "Successfully Deleted"
+            message: "Successfully Deleted",
           })
         );
-        res.end();
+        return res.end();
       } catch (error) {
         res.statusCode = 500; // Server Error
         res.setHeader("Content-Type", "application/json");
         res.write(
           JSON.stringify({
-            message: "Something went wrong, try again later!"
+            message: "Something went wrong, try again later!",
           })
         );
-        res.end();
+        return res.end();
       }
     });
   }
